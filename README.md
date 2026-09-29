@@ -4,9 +4,21 @@
 
 本地计算脚本使用 Python 3.9 或更新版本的标准库，无需安装第三方依赖。
 
-## 作为 Skill 使用
+## 安装 Skill
 
-整个仓库就是一个 Skill 文件夹：`SKILL.md` 是完整的标准入口，`references/` 和 `scripts/` 是配套资源。将仓库克隆到所用工具的 Skills 目录，即可按该工具的方式调用。`agents/openai.yaml` 仅提供 Codex 的界面信息，不影响其他工具读取 `SKILL.md`。
+整个仓库就是一个 Skill 文件夹：根目录的 `SKILL.md` 是入口，`references/` 和 `scripts/` 是配套资源。安装时保留整个文件夹，不能只复制 `SKILL.md`。`agents/openai.yaml` 仅提供 Codex 的界面信息，不影响其他工具读取本 Skill。
+
+### 让 AI 助手安装
+
+在能联网、能操作本地文件的 Agent 中发送下面这段话。它需要获得相应的网络和文件权限；如果当前工具不支持从 GitHub 安装，就使用下一节的手动方式。
+
+> 请从 https://github.com/xiasimon7/car-insurance-compare 下载完整仓库，将其安装到你当前工具的个人 Skills 目录，保留 `SKILL.md`、`references/` 和 `scripts/`。安装后检查 `car-insurance-compare/SKILL.md` 是否位于技能目录内，确认技能已加载，并告诉我如何调用。若不能直接安装，请说明当前界面支持的本地导入方式。
+
+### 手动安装
+
+1. 在 [GitHub 仓库](https://github.com/xiasimon7/car-insurance-compare)点击 **Code → Download ZIP**，解压后将文件夹命名为 `car-insurance-compare`；也可以用 `git clone` 下载。
+2. 若工具提供“上传／导入技能”，导入包含完整 Skill 的文件夹或压缩包。若工具使用个人 Skills 目录，把整个 `car-insurance-compare` 文件夹放到下表对应位置；最终应能找到 `car-insurance-compare/SKILL.md`。
+3. 在工具的已安装技能列表中确认名称，必要时重开会话或按工具说明重新加载，再用下方的虚构示例试运行。
 
 | 工具 | 个人 Skill 目录或安装方式 |
 | --- | --- |
@@ -18,15 +30,15 @@
 | [千问办公](https://docs.qwenwork.cn/features/skills) | `~/.qwenworkcn/skills/car-insurance-compare/`，或在「扩展 → 技能」上传包含 `SKILL.md` 的技能包 |
 | [腾讯 WorkBuddy](https://cloud.tencent.com/document/product/1831/134432) | 在「专家·技能·连接器 → 添加技能 → 上传技能」导入本地技能包 |
 | [Qoder IDE／CLI](https://docs.qoder.com/zh/extensions/skills) | `~/.qoder/skills/car-insurance-compare/`，或项目内 `.qoder/skills/car-insurance-compare/` |
-| [豆包桌面版的工作任务模式／豆包工作](https://docs.volcengine.com/docs/volcano-engine-skills/overview-2?lang=zh) | 官方资料将其列为支持 Skill 的 Agent；本仓库的具体导入入口待客户端实测 |
+| [豆包桌面版的工作任务模式／豆包工作](https://docs.volcengine.com/docs/volcano-engine-skills/overview-2?lang=zh) | 在「插件·技能·伙伴 → 技能 → ＋添加」检查当前版本的导入方式；本仓库尚未在该客户端实测 |
 
 上表依据各工具的官方文档列出支持情况；除 Codex 外尚未在本项目中逐一实测。各工具的触发方式、图片附件支持和脚本权限可能不同，请按其官方说明设置。豆包普通聊天可用报价图片提问；若要安装 Skill，应在桌面版的工作任务模式中核实当前版本的技能入口。
 
 AI **模型**与承载它的**应用或 Agent 工具**需要区分：使用豆包、DeepSeek 等模型，并不自动说明当前聊天界面能安装 Skill；若承载该模型的工具支持 Agent Skills，就按上面的方法安装。没有图片输入时提供脱敏的 OCR 文字；不能运行本地脚本时 Skill 会要求助手列出算式与待核对数字。各平台对附件和个人资料的处理方式不同，上传前请自行核对其隐私设置。
 
-## 安装与试运行
+### 可选：试运行本地计算脚本
 
-按上表将仓库放入所用工具的 Skills 目录，文件夹名保持 `car-insurance-compare`。在支持图片输入的工具中调用该 Skill，附上一份或多份报价图片、销售聊天和用车需求；多份报价时可用本地脚本复算。用户无需先填写 JSON，原始保单可留在自己的工作目录。
+脚本用于复算已整理的结构化报价，不负责读图，也不是安装 Skill 的必需步骤：
 
 ```bash
 git clone "https://github.com/xiasimon7/car-insurance-compare.git"
@@ -34,7 +46,7 @@ cd car-insurance-compare
 python3 scripts/compare.py examples/quotes.json
 ```
 
-上面的命令可先在任意工作目录试运行；正式安装时再按所用工具的目录放置整个文件夹。Codex 中可用 `$car-insurance-compare` 调用，其他工具遵循各自的 Skill 调用方式。示例数据完全虚构：A 应付 4980.00 元，销售承诺返现 200.00 元；B 应付 4760.00 元。脚本会提示车损、三者险和外部电网险的口径差异，不做最终价格排名。
+Codex 中可用 `$car-insurance-compare` 调用，其他工具遵循各自的 Skill 调用方式。示例数据完全虚构：A 应付 4980.00 元，销售承诺返现 200.00 元；B 应付 4760.00 元。脚本会提示车损、三者险和外部电网险的口径差异，不做最终价格排名。
 
 ## 一次完整使用示例
 
