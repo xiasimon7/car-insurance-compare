@@ -30,13 +30,11 @@
 | [千问办公](https://docs.qwenwork.cn/features/skills) | `~/.qwenworkcn/skills/car-insurance-compare/`，或在「扩展 → 技能」上传包含 `SKILL.md` 的技能包 |
 | [腾讯 WorkBuddy](https://cloud.tencent.com/document/product/1831/134432) | 在「专家·技能·连接器 → 添加技能 → 上传技能」导入本地技能包 |
 | [Qoder IDE／CLI](https://docs.qoder.com/zh/extensions/skills) | `~/.qoder/skills/car-insurance-compare/`，或项目内 `.qoder/skills/car-insurance-compare/` |
-| [豆包桌面版的工作任务模式／豆包工作](https://docs.volcengine.com/docs/volcano-engine-skills/overview-2?lang=zh) | 在「插件·技能·伙伴 → 技能 → ＋添加」检查当前版本的导入方式；本仓库尚未在该客户端实测 |
-
-上表列的是支持 Skill 的工具及其安装入口，除 Codex 外尚未逐一实测。图片读取、脚本运行和触发方式取决于具体工具；使用某个 AI 模型，并不代表承载它的聊天界面支持安装 Skill。
+| [豆包](https://docs.volcengine.com/docs/volcano-engine-skills/overview-2?lang=zh) | 桌面版：「插件·技能·伙伴 → 技能 → ＋添加」 |
 
 ### 可选：试运行本地计算脚本
 
-脚本用于复算已整理的结构化报价，不负责读图，也不是安装 Skill 的必需步骤：
+多份报价会先整理为统一字段：从图片或文字提取信息，标注来源与待确认项，核对关键数字后按[输入格式](references/schema.md)生成脱敏 JSON，再用脚本复算。用户无需手填 JSON；脚本不是安装 Skill 的必需步骤。
 
 ```bash
 git clone "https://github.com/xiasimon7/car-insurance-compare.git"
