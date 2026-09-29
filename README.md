@@ -18,8 +18,9 @@
 | [千问办公](https://docs.qwenwork.cn/features/skills) | `~/.qwenworkcn/skills/car-insurance-compare/`，或在「扩展 → 技能」上传包含 `SKILL.md` 的技能包 |
 | [腾讯 WorkBuddy](https://cloud.tencent.com/document/product/1831/134432) | 在「专家·技能·连接器 → 添加技能 → 上传技能」导入本地技能包 |
 | [Qoder IDE／CLI](https://docs.qoder.com/zh/extensions/skills) | `~/.qoder/skills/car-insurance-compare/`，或项目内 `.qoder/skills/car-insurance-compare/` |
+| [豆包桌面版的工作任务模式／豆包工作](https://docs.volcengine.com/docs/volcano-engine-skills/overview-2?lang=zh) | 官方资料将其列为支持 Skill 的 Agent；本仓库的具体导入入口待客户端实测 |
 
-上表依据各工具的官方文档列出入口；除 Codex 外尚未在本项目中逐一实测。各工具的触发方式、图片附件支持和脚本权限可能不同，请按其官方说明设置。豆包普通聊天界面可接收报价图片并回答问题，但目前未查到将本仓库安装为 Agent Skill 的官方方法，因此未列入安装表。
+上表依据各工具的官方文档列出支持情况；除 Codex 外尚未在本项目中逐一实测。各工具的触发方式、图片附件支持和脚本权限可能不同，请按其官方说明设置。豆包普通聊天可用报价图片提问；若要安装 Skill，应在桌面版的工作任务模式中核实当前版本的技能入口。
 
 AI **模型**与承载它的**应用或 Agent 工具**需要区分：使用豆包、DeepSeek 等模型，并不自动说明当前聊天界面能安装 Skill；若承载该模型的工具支持 Agent Skills，就按上面的方法安装。没有图片输入时提供脱敏的 OCR 文字；不能运行本地脚本时 Skill 会要求助手列出算式与待核对数字。各平台对附件和个人资料的处理方式不同，上传前请自行核对其隐私设置。
 
