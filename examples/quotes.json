@@ -1,0 +1,39 @@
+{
+  "quotes": [
+    {
+      "id": "A",
+      "insurer": "示例甲财险",
+      "source_ref": "虚构报价A",
+      "premium": {
+        "commercial": "3800.00",
+        "compulsory": "760.00",
+        "vehicle_tax": "0.00",
+        "separate_products": [{"name": "驾乘意外组合", "amount": "420.00"}],
+        "stated_payable": "4980.00",
+        "cashback": {"amount": "200.00", "status": "promised"}
+      },
+      "coverage": [
+        {"code": "vehicle_damage", "limit": "220000.00", "unit": "vehicle", "source_ref": "虚构报价A"},
+        {"code": "third_party", "limit": "3000000.00", "unit": "vehicle", "source_ref": "虚构报价A"},
+        {"code": "external_grid", "limit": "220000.00", "unit": "vehicle", "source_ref": "虚构报价A"}
+      ]
+    },
+    {
+      "id": "B",
+      "insurer": "示例乙财险",
+      "source_ref": "虚构报价B",
+      "premium": {
+        "commercial": "3600.00",
+        "compulsory": "760.00",
+        "vehicle_tax": "0.00",
+        "separate_products": [{"name": "驾乘意外组合", "amount": "400.00"}],
+        "stated_payable": "4760.00",
+        "cashback": {"amount": "0.00", "status": "none"}
+      },
+      "coverage": [
+        {"code": "vehicle_damage", "limit": "210000.00", "unit": "vehicle", "source_ref": "虚构报价B"},
+        {"code": "third_party", "limit": "4000000.00", "unit": "vehicle", "source_ref": "虚构报价B"}
+      ]
+    }
+  ]
+}

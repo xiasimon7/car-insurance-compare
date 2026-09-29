@@ -1,0 +1,37 @@
+# 车险比价助手
+
+一个供 Codex 调用的中国大陆车险报价比较 Skill。把一份或多份报价图片、权益图和销售说明发给支持图片输入的 Codex，它会读图、拆解费用和保障，在证据足够时给出购买建议，也可拟一段发给销售的确认文字。它不连接保险公司、不代用户投保，也不把销售宣传当作正式保单。
+
+本地计算脚本使用 Python 3.9 或更新版本的标准库，无需安装第三方依赖。
+
+## 使用
+
+将本仓库克隆到 Codex 的 Skills 目录，文件夹名保持 `car-insurance-compare`。在 Codex 中调用 `$car-insurance-compare`，附上一份或多份报价图片、销售聊天和你关心的用车场景。Codex 会直接读图并回看关键数字；多份报价时再用本地脚本复算。你无需先做 OCR 或填写 JSON，原始保单可留在你的本地工作目录。
+
+```bash
+git clone "https://github.com/xiasimon7/car-insurance-compare.git" "$HOME/.codex/skills/car-insurance-compare"
+python "$HOME/.codex/skills/car-insurance-compare/scripts/compare.py" \
+  "$HOME/.codex/skills/car-insurance-compare/examples/quotes.json"
+```
+
+仓库发布后可直接使用上面的安装命令。当前也可在此目录运行 `python scripts/compare.py examples/quotes.json`。示例数据完全虚构：A 应付 4980.00 元，销售承诺返现 200.00 元；B 应付 4760.00 元。脚本会提示车损、三者险和外部电网险的口径差异，不做最终价格排名。
+
+## 能做什么
+
+- 分开显示商业险、交强险、车船税、单列保障产品、应付总额与返现后的条件净价。
+- 对报价未列的险种、不同保额和每车/每座等单位差异给出核对提示。
+- 引导 Codex 对照原图、正式条款和用户实际需求，整理可发给销售的确认问题。
+
+## 当前边界
+
+Codex 可直接阅读所附图片并给出有依据的建议；模糊、裁切或相互矛盾的关键数字需要回看原图或请用户确认。本地脚本只接受结构化 JSON，不承担读图。免赔、赔付比例、年龄分档和赠券价值须结合具体资料判断。报价未列某项不等于正式保单肯定没有。返现显示为条件算术结果，未到账前不能当作实际支出。
+
+输入格式见 [references/schema.md](references/schema.md)，判断口径见 [references/review_rules.md](references/review_rules.md)。测试命令：`python -m unittest discover -s tests -v`。
+
+## 隐私与公开仓库
+
+仓库只包含原创代码、规则和虚构示例。请勿提交真实报价截图、姓名、车牌、VIN、手机号、保单号或销售聊天记录。把本地输入放在 `private/` 或以 `.local.json` 结尾的文件中，并在提交前复核跟踪文件。计算脚本无需联网。
+
+## 许可证
+
+本项目采用 [MIT 许可证](LICENSE)，版权声明使用项目所有者的 GitHub 用户名 `xiasimon7`。

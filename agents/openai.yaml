@@ -1,0 +1,3 @@
+interface:
+  display_name: "车险比价助手"
+  short_description: "复算车险报价并提示保障差异与待确认条件"

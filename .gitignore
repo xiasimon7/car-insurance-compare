@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.venv/
+*.local.json
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.pdf
+*.docx
+*.xlsx
+.env
+private/
+reports/
