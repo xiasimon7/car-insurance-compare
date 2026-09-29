@@ -1,14 +1,24 @@
 # 车险比价助手
 
-一个适用于中国大陆车险报价比较的开放项目，提供可复制到不同 AI 助手的[通用指令](PROMPT.md)、Codex Skill 和本地计算脚本；不限定城市、汽车品牌或燃油／新能源车型。把一份或多份报价图片、权益图和销售说明交给支持图片输入的 AI 助手，它可以据此拆解费用和保障、提出购买建议与待确认问题。若当前助手不支持图片输入，可提供脱敏的 OCR 文本或手工摘录。项目不连接保险公司、不代用户投保，也不把销售宣传当作正式保单。
+一个适用于中国大陆车险报价比较的 [Agent Skills](https://agentskills.io/specification) 项目，包含跨工具使用的 `SKILL.md`、核对规则和本地计算脚本；不限定城市、汽车品牌或燃油／新能源车型。把一份或多份报价图片、权益图和销售说明交给支持图片输入的 AI 助手，它可以据此拆解费用和保障、提出购买建议与待确认问题。若当前助手不支持图片输入，可提供脱敏的 OCR 文本或手工摘录。项目不连接保险公司、不代用户投保，也不把销售宣传当作正式保单。
 
 本地计算脚本使用 Python 3.9 或更新版本的标准库，无需安装第三方依赖。
 
-## 在其他 AI 助手中使用
+## 作为 Skill 使用
 
-打开 [PROMPT.md](PROMPT.md)，将全文复制到你使用的 AI 助手，再附上报价图片、权益说明和销售文字，并说明自己的用车需求。若助手不能看图，先提供脱敏的 OCR 文字；若不能运行本地代码，让它逐项列出算式和待核对数字。各平台对附件和个人资料的处理方式不同，上传前请自行核对其隐私设置。
+整个仓库就是一个 Skill 文件夹：`SKILL.md` 是完整的标准入口，`references/` 和 `scripts/` 是配套资源。将仓库克隆到所用工具的 Skills 目录，即可按该工具的方式调用。`agents/openai.yaml` 仅提供 Codex 的界面信息，不影响其他工具读取 `SKILL.md`。
 
-`PROMPT.md` 是可直接复制的通用指令；`SKILL.md` 是 Codex 的接入文件。其他平台若支持自己的 Skill 或插件格式，可基于通用指令适配，但本仓库不保证它们能直接加载 Codex 的文件结构。
+| 工具 | 个人 Skill 目录或安装方式 |
+| --- | --- |
+| [Codex](https://developers.openai.com/codex/skills) | `~/.codex/skills/car-insurance-compare/` |
+| [Claude Code](https://code.claude.com/docs/en/skills) | `~/.claude/skills/car-insurance-compare/` |
+| [Cursor](https://prod.cursor.com/docs/skills) | `~/.cursor/skills/car-insurance-compare/` |
+| [Gemini CLI](https://geminicli.com/docs/cli/using-agent-skills/) | `gemini skills install https://github.com/xiasimon7/car-insurance-compare` |
+| [GitHub Copilot](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills) | `~/.copilot/skills/car-insurance-compare/` |
+
+上表依据各工具的官方文档列出入口；除 Codex 外尚未在本项目中逐一实测。各工具的触发方式和脚本权限可能不同，请按其官方说明设置。
+
+AI **模型**与承载它的**应用或 Agent 工具**需要区分：使用豆包、DeepSeek 等模型，并不自动说明当前聊天界面能安装 Skill；若承载该模型的工具支持 Agent Skills，就按上面的方法安装。没有图片输入时提供脱敏的 OCR 文字；不能运行本地脚本时 Skill 会要求助手列出算式与待核对数字。各平台对附件和个人资料的处理方式不同，上传前请自行核对其隐私设置。
 
 ## 在 Codex 中使用
 
@@ -24,9 +34,9 @@ python "$HOME/.codex/skills/car-insurance-compare/scripts/compare.py" \
 
 ## 一次完整使用示例
 
-在支持图片输入的 AI 助手中附上两份报价截图和对应的销售说明。非 Codex 用户先复制 [PROMPT.md](PROMPT.md) 全文，再输入：
+在已安装本 Skill、支持图片输入的 AI 工具中附上两份报价截图和对应的销售说明，再输入：
 
-> 请按车险比价指令比较这两份报价。我更在意保障合适后少花钱；返现尚未到账。请标出图片中无法核实的数字、需要问销售的问题，并给我一段可复制的询问文字。
+> 请用车险比价助手比较这两份报价。我更在意保障合适后少花钱；返现尚未到账。请标出图片中无法核实的数字、需要问销售的问题，并给我一段可复制的询问文字。
 
 以仓库中的**虚构数据**演示，报告应先列出：A 今天应付 4980.00 元，承诺返现兑现后可能净支出 4780.00 元；B 今天应付 4760.00 元。随后指出 A、B 的车损保额分别为 22 万元和 21 万元，三者险分别为 300 万元和 400 万元，外部电网险只在 A 的输入报价中列出。因为保障口径不同，此时应请销售确认缺项并按相同保障重报，再决定哪份更合适。报告还应注明各数字来自哪张报价图或哪段销售说明；截图模糊时先请用户核对，不猜测。
 
