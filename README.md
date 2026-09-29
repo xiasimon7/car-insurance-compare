@@ -15,8 +15,11 @@
 | [Cursor](https://prod.cursor.com/docs/skills) | `~/.cursor/skills/car-insurance-compare/` |
 | [Gemini CLI](https://geminicli.com/docs/cli/using-agent-skills/) | `gemini skills install https://github.com/xiasimon7/car-insurance-compare` |
 | [GitHub Copilot](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills) | `~/.copilot/skills/car-insurance-compare/` |
+| [千问办公](https://docs.qwenwork.cn/features/skills) | `~/.qwenworkcn/skills/car-insurance-compare/`，或在「扩展 → 技能」上传包含 `SKILL.md` 的技能包 |
+| [腾讯 WorkBuddy](https://cloud.tencent.com/document/product/1831/134432) | 在「专家·技能·连接器 → 添加技能 → 上传技能」导入本地技能包 |
+| [Qoder IDE／CLI](https://docs.qoder.com/zh/extensions/skills) | `~/.qoder/skills/car-insurance-compare/`，或项目内 `.qoder/skills/car-insurance-compare/` |
 
-上表依据各工具的官方文档列出入口；除 Codex 外尚未在本项目中逐一实测。各工具的触发方式和脚本权限可能不同，请按其官方说明设置。
+上表依据各工具的官方文档列出入口；除 Codex 外尚未在本项目中逐一实测。各工具的触发方式、图片附件支持和脚本权限可能不同，请按其官方说明设置。豆包普通聊天界面可接收报价图片并回答问题，但目前未查到将本仓库安装为 Agent Skill 的官方方法，因此未列入安装表。
 
 AI **模型**与承载它的**应用或 Agent 工具**需要区分：使用豆包、DeepSeek 等模型，并不自动说明当前聊天界面能安装 Skill；若承载该模型的工具支持 Agent Skills，就按上面的方法安装。没有图片输入时提供脱敏的 OCR 文字；不能运行本地脚本时 Skill 会要求助手列出算式与待核对数字。各平台对附件和个人资料的处理方式不同，上传前请自行核对其隐私设置。
 
