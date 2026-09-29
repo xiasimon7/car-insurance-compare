@@ -14,7 +14,7 @@ python "$HOME/.codex/skills/car-insurance-compare/scripts/compare.py" \
   "$HOME/.codex/skills/car-insurance-compare/examples/quotes.json"
 ```
 
-仓库发布后可直接使用上面的安装命令。当前也可在此目录运行 `python scripts/compare.py examples/quotes.json`。示例数据完全虚构：A 应付 4980.00 元，销售承诺返现 200.00 元；B 应付 4760.00 元。脚本会提示车损、三者险和外部电网险的口径差异，不做最终价格排名。
+可直接使用上面的安装命令；在仓库目录中也可运行 `python scripts/compare.py examples/quotes.json`。示例数据完全虚构：A 应付 4980.00 元，销售承诺返现 200.00 元；B 应付 4760.00 元。脚本会提示车损、三者险和外部电网险的口径差异，不做最终价格排名。
 
 ## 一次完整使用示例
 
