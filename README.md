@@ -1,6 +1,6 @@
 # 车险比价助手
 
-一个供 Codex 调用的中国大陆车险报价比较 Skill。把一份或多份报价图片、权益图和销售说明发给支持图片输入的 Codex，它会读图、拆解费用和保障，在证据足够时给出购买建议，也可拟一段发给销售的确认文字。它不连接保险公司、不代用户投保，也不把销售宣传当作正式保单。
+一个供 Codex 调用的中国大陆车险报价比较 Skill，适用于不同城市、品牌和燃油／新能源车型。把一份或多份报价图片、权益图和销售说明发给支持图片输入的 Codex，它会读图、拆解费用和保障，在证据足够时给出购买建议；影响判断的条件不明时，会拟出发给对应销售的具体问题。它不连接保险公司、不代用户投保，也不把销售宣传当作正式保单。
 
 本地计算脚本使用 Python 3.9 或更新版本的标准库，无需安装第三方依赖。
 
@@ -19,14 +19,15 @@ python "$HOME/.codex/skills/car-insurance-compare/scripts/compare.py" \
 ## 能做什么
 
 - 分开显示商业险、交强险、车船税、单列保障产品、应付总额与返现后的条件净价。
-- 对报价未列的险种、不同保额和每车/每座等单位差异给出核对提示。
+- 对报价未列的险种、不同保额和每车/每座等单位差异给出核对提示；商业险单独报价只显示已知小计，不冒充整单价格。
 - 引导 Codex 对照原图、正式条款和用户实际需求，整理可发给销售的确认问题。
+- 根据当前谈判阶段，拟出可复制的询价、重报或最终确认文字；不会自行发送。
 
 ## 当前边界
 
 Codex 可直接阅读所附图片并给出有依据的建议；模糊、裁切或相互矛盾的关键数字需要回看原图或请用户确认。本地脚本只接受结构化 JSON，不承担读图。免赔、赔付比例、年龄分档和赠券价值须结合具体资料判断。报价未列某项不等于正式保单肯定没有。返现显示为条件算术结果，未到账前不能当作实际支出。
 
-输入格式见 [references/schema.md](references/schema.md)，判断口径见 [references/review_rules.md](references/review_rules.md)。测试命令：`python -m unittest discover -s tests -v`。
+输入格式见 [references/schema.md](references/schema.md)，判断口径见 [references/review_rules.md](references/review_rules.md)，销售沟通方式见 [references/negotiation.md](references/negotiation.md)。测试命令：`python -m unittest discover -s tests -v`。
 
 ## 隐私与公开仓库
 

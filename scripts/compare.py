@@ -25,6 +25,13 @@ def amount(value: object, path: str) -> Decimal:
     return Decimal(value).quantize(CENT)
 
 
+def optional_amount(value: object, path: str) -> Decimal | None:
+    """未知金额用 null 表示，不能用 0 冒充已确认的零元。"""
+    if value is None:
+        return None
+    return amount(value, path)
+
+
 def money(value: Decimal) -> str:
     return f"{value:.2f}"
 
@@ -47,9 +54,13 @@ def parse_quote(raw: object, index: int) -> tuple[dict, dict]:
     insurer = nonempty(quote.get("insurer"), f"quotes[{index}].insurer")
     source_ref = nonempty(quote.get("source_ref"), f"quotes[{index}].source_ref")
     premium = obj(quote.get("premium"), f"{qid}.premium")
-    commercial = amount(premium.get("commercial"), f"{qid}.commercial")
-    compulsory = amount(premium.get("compulsory"), f"{qid}.compulsory")
-    tax = amount(premium.get("vehicle_tax"), f"{qid}.vehicle_tax")
+    commercial = optional_amount(premium.get("commercial"), f"{qid}.commercial")
+    compulsory = optional_amount(premium.get("compulsory"), f"{qid}.compulsory")
+    tax = optional_amount(premium.get("vehicle_tax"), f"{qid}.vehicle_tax")
+    components = {"commercial": commercial, "compulsory": compulsory, "vehicle_tax": tax}
+    missing_components = [name for name, value in components.items() if value is None]
+    if len(missing_components) == len(components):
+        raise InputError(f"{qid}.premium 至少需要一项已确认的保费金额")
     products = premium.get("separate_products", [])
     if not isinstance(products, list):
         raise InputError(f"{qid}.separate_products 必须是数组")
@@ -59,18 +70,23 @@ def parse_quote(raw: object, index: int) -> tuple[dict, dict]:
         nonempty(product.get("name"), f"{qid}.separate_products[{n}].name")
         product_sum += amount(product.get("amount"), f"{qid}.separate_products[{n}].amount")
 
-    gross = commercial + compulsory + tax + product_sum
+    known_subtotal = sum((value for value in components.values() if value is not None), Decimal("0.00")) + product_sum
+    gross = known_subtotal if not missing_components else None
     cashback_raw = obj(premium.get("cashback", {"amount": "0", "status": "none"}), f"{qid}.cashback")
     cashback = amount(cashback_raw.get("amount"), f"{qid}.cashback.amount")
     status = cashback_raw.get("status")
     if status not in {"promised", "received", "none"}:
         raise InputError(f"{qid}.cashback.status 必须为 promised、received 或 none")
-    if (status == "none" and cashback != 0) or cashback > gross:
+    if (status == "none" and cashback != 0) or (gross is not None and cashback > gross):
         raise InputError(f"{qid}.cashback 与状态或应付总价不一致")
     warnings: list[str] = []
+    if missing_components:
+        warnings.append("保费组成未齐，已知小计不是整单应付；请向销售确认缺项")
     if "stated_payable" in premium:
         stated = amount(premium["stated_payable"], f"{qid}.stated_payable")
-        if stated != gross:
+        if gross is None:
+            warnings.append("报价单总价尚无法与逐项金额核对")
+        elif stated != gross:
             warnings.append(f"报价单应付 {money(stated)} 元与逐项求和 {money(gross)} 元不一致，需核对")
 
     coverage_raw = quote.get("coverage", [])
@@ -101,18 +117,20 @@ def parse_quote(raw: object, index: int) -> tuple[dict, dict]:
         "insurer": insurer,
         "source_ref": source_ref,
         "premium_breakdown": {
-            "commercial": money(commercial),
-            "compulsory": money(compulsory),
-            "vehicle_tax": money(tax),
+            "commercial": money(commercial) if commercial is not None else None,
+            "compulsory": money(compulsory) if compulsory is not None else None,
+            "vehicle_tax": money(tax) if tax is not None else None,
             "separate_products": [
                 {"name": p["name"], "amount": money(amount(p["amount"], f"{qid}.separate_products.amount"))}
                 for p in products
             ],
         },
-        "payable_now": money(gross),
+        "known_subtotal": money(known_subtotal),
+        "missing_premium_components": missing_components,
+        "payable_now": money(gross) if gross is not None else None,
         "cashback_amount": money(cashback),
         "cashback_status": status,
-        "after_cashback_if_received": money(gross - cashback),
+        "after_cashback_if_received": money(gross - cashback) if gross is not None else None,
         "separate_products_total": money(product_sum),
         "warnings": warnings,
     }

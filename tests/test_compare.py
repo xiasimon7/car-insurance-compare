@@ -71,6 +71,17 @@ class CompareTests(unittest.TestCase):
         with self.assertRaises(compare_module.InputError):
             compare_module.compare(self.data)
 
+    def test_commercial_only_quote_cannot_look_like_full_policy_price(self):
+        quote = self.data["quotes"][1]
+        quote["premium"]["compulsory"] = None
+        quote["premium"]["vehicle_tax"] = None
+        result = compare_module.compare(self.data)["quotes"][1]
+        self.assertEqual(result["known_subtotal"], "4000.00")
+        self.assertEqual(result["missing_premium_components"], ["compulsory", "vehicle_tax"])
+        self.assertIsNone(result["payable_now"])
+        self.assertIsNone(result["after_cashback_if_received"])
+        self.assertIn("不是整单应付", result["warnings"][0])
+
 
 if __name__ == "__main__":
     unittest.main()
