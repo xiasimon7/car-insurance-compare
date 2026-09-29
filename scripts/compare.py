@@ -7,7 +7,7 @@ import argparse
 import json
 import re
 import sys
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 MONEY = re.compile(r"^(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?$")
@@ -22,7 +22,10 @@ def amount(value: object, path: str) -> Decimal:
     """拒绝浮点数和负数，避免保费分位被隐式舍入。"""
     if not isinstance(value, str) or not MONEY.fullmatch(value):
         raise InputError(f"{path} 必须是非负金额字符串，最多两位小数")
-    return Decimal(value).quantize(CENT)
+    try:
+        return Decimal(value).quantize(CENT)
+    except InvalidOperation as exc:
+        raise InputError(f"{path} 金额超出可处理范围") from exc
 
 
 def optional_amount(value: object, path: str) -> Decimal | None:
@@ -61,9 +64,9 @@ def parse_quote(raw: object, index: int) -> tuple[dict, dict]:
     missing_components = [name for name, value in components.items() if value is None]
     if len(missing_components) == len(components):
         raise InputError(f"{qid}.premium 至少需要一项已确认的保费金额")
-    products = premium.get("separate_products", [])
+    products = premium.get("separate_products")
     if not isinstance(products, list):
-        raise InputError(f"{qid}.separate_products 必须是数组")
+        raise InputError(f"{qid}.separate_products 必须是数组；确认没有单列收费产品时填 []")
     product_sum = Decimal("0.00")
     for n, raw_product in enumerate(products):
         product = obj(raw_product, f"{qid}.separate_products[{n}]")
@@ -72,16 +75,22 @@ def parse_quote(raw: object, index: int) -> tuple[dict, dict]:
 
     known_subtotal = sum((value for value in components.values() if value is not None), Decimal("0.00")) + product_sum
     gross = known_subtotal if not missing_components else None
-    cashback_raw = obj(premium.get("cashback", {"amount": "0", "status": "none"}), f"{qid}.cashback")
-    cashback = amount(cashback_raw.get("amount"), f"{qid}.cashback.amount")
+    cashback_raw = obj(premium.get("cashback"), f"{qid}.cashback")
+    cashback = optional_amount(cashback_raw.get("amount"), f"{qid}.cashback.amount")
     status = cashback_raw.get("status")
-    if status not in {"promised", "received", "none"}:
-        raise InputError(f"{qid}.cashback.status 必须为 promised、received 或 none")
-    if (status == "none" and cashback != 0) or (gross is not None and cashback > gross):
+    if status not in {"promised", "received", "none", "unknown"}:
+        raise InputError(f"{qid}.cashback.status 必须为 promised、received、none 或 unknown")
+    if status == "unknown" and cashback is not None:
+        raise InputError(f"{qid}.cashback 未确认时金额填 null")
+    if status != "unknown" and cashback is None:
+        raise InputError(f"{qid}.cashback 已确认的状态必须填写金额")
+    if (status == "none" and cashback != 0) or (gross is not None and cashback is not None and cashback > gross):
         raise InputError(f"{qid}.cashback 与状态或应付总价不一致")
     warnings: list[str] = []
     if missing_components:
         warnings.append("保费组成未齐，已知小计不是整单应付；请向销售确认缺项")
+    if status == "unknown":
+        warnings.append("返现金额或条件未确认；暂不计算返现后金额")
     if "stated_payable" in premium:
         stated = amount(premium["stated_payable"], f"{qid}.stated_payable")
         if gross is None:
@@ -128,9 +137,9 @@ def parse_quote(raw: object, index: int) -> tuple[dict, dict]:
         "known_subtotal": money(known_subtotal),
         "missing_premium_components": missing_components,
         "payable_now": money(gross) if gross is not None else None,
-        "cashback_amount": money(cashback),
+        "cashback_amount": money(cashback) if cashback is not None else None,
         "cashback_status": status,
-        "after_cashback_if_received": money(gross - cashback) if gross is not None else None,
+        "after_cashback_if_received": money(gross - cashback) if gross is not None and cashback is not None else None,
         "separate_products_total": money(product_sum),
         "warnings": warnings,
     }

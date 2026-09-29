@@ -43,6 +43,9 @@ class CompareTests(unittest.TestCase):
         self.data["quotes"][0]["premium"]["commercial"] = 3800.0
         with self.assertRaises(compare_module.InputError):
             compare_module.compare(self.data)
+        self.data["quotes"][0]["premium"]["commercial"] = "9" * 30
+        with self.assertRaises(compare_module.InputError):
+            compare_module.compare(self.data)
 
     def test_duplicate_quote_or_coverage_is_rejected(self):
         self.data["quotes"][1]["id"] = "A"
@@ -81,6 +84,23 @@ class CompareTests(unittest.TestCase):
         self.assertIsNone(result["payable_now"])
         self.assertIsNone(result["after_cashback_if_received"])
         self.assertIn("不是整单应付", result["warnings"][0])
+
+    def test_omitted_separate_products_or_cashback_cannot_imply_none(self):
+        premium = self.data["quotes"][0]["premium"]
+        premium.pop("separate_products")
+        with self.assertRaises(compare_module.InputError):
+            compare_module.compare(self.data)
+        premium["separate_products"] = []
+        premium.pop("cashback")
+        with self.assertRaises(compare_module.InputError):
+            compare_module.compare(self.data)
+
+    def test_unknown_cashback_does_not_create_net_price(self):
+        self.data["quotes"][0]["premium"]["cashback"] = {"amount": None, "status": "unknown"}
+        quote = compare_module.compare(self.data)["quotes"][0]
+        self.assertEqual(quote["payable_now"], "4980.00")
+        self.assertIsNone(quote["after_cashback_if_received"])
+        self.assertIn("未确认", quote["warnings"][0])
 
 
 if __name__ == "__main__":
