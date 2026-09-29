@@ -20,17 +20,17 @@
 
 AI **模型**与承载它的**应用或 Agent 工具**需要区分：使用豆包、DeepSeek 等模型，并不自动说明当前聊天界面能安装 Skill；若承载该模型的工具支持 Agent Skills，就按上面的方法安装。没有图片输入时提供脱敏的 OCR 文字；不能运行本地脚本时 Skill 会要求助手列出算式与待核对数字。各平台对附件和个人资料的处理方式不同，上传前请自行核对其隐私设置。
 
-## 在 Codex 中使用
+## 安装与试运行
 
-将本仓库克隆到 Codex 的 Skills 目录，文件夹名保持 `car-insurance-compare`。在支持图片输入的 Codex 中调用 `$car-insurance-compare`，附上一份或多份报价图片、销售聊天和你关心的用车场景；多份报价时可用本地脚本复算。你无需先做 OCR 或填写 JSON，原始保单可留在你的本地工作目录。
+按上表将仓库放入所用工具的 Skills 目录，文件夹名保持 `car-insurance-compare`。在支持图片输入的工具中调用该 Skill，附上一份或多份报价图片、销售聊天和用车需求；多份报价时可用本地脚本复算。用户无需先填写 JSON，原始保单可留在自己的工作目录。
 
 ```bash
-git clone "https://github.com/xiasimon7/car-insurance-compare.git" "$HOME/.codex/skills/car-insurance-compare"
-python "$HOME/.codex/skills/car-insurance-compare/scripts/compare.py" \
-  "$HOME/.codex/skills/car-insurance-compare/examples/quotes.json"
+git clone "https://github.com/xiasimon7/car-insurance-compare.git"
+cd car-insurance-compare
+python3 scripts/compare.py examples/quotes.json
 ```
 
-可直接使用上面的安装命令；在仓库目录中也可运行 `python scripts/compare.py examples/quotes.json`。示例数据完全虚构：A 应付 4980.00 元，销售承诺返现 200.00 元；B 应付 4760.00 元。脚本会提示车损、三者险和外部电网险的口径差异，不做最终价格排名。
+上面的命令可先在任意工作目录试运行；正式安装时再按所用工具的目录放置整个文件夹。Codex 中可用 `$car-insurance-compare` 调用，其他工具遵循各自的 Skill 调用方式。示例数据完全虚构：A 应付 4980.00 元，销售承诺返现 200.00 元；B 应付 4760.00 元。脚本会提示车损、三者险和外部电网险的口径差异，不做最终价格排名。
 
 ## 一次完整使用示例
 
